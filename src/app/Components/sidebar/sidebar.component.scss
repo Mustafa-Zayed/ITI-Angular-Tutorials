@@ -1,0 +1,13 @@
+#sidebar {
+  width: 250px;
+  min-height: 100vh;
+}
+
+#page-content-wrapper {
+  width: 100%;
+}
+
+.collapsed #sidebar {
+  width: 0;
+  display: none;
+}

@@ -1,0 +1,64 @@
+<h2>Create Your Order:</h2>
+
+<div class="mb-3">
+  <label for="cat" class="form-label">Category</label>
+
+  <!-- <select
+    class="form-select form-select-lg"
+    name="category"
+    id="cat"
+    [(ngModel)]="selectedCategoryName"
+    (change)="filterCategoriesByRecievedSelectedCategoryName()"
+  >
+    <option value="" selected>Select one</option>
+    <option *ngFor="let category of categories" [value]="category.name">
+      {{ category.name }}
+    </option>
+  </select> -->
+
+  <select
+    class="form-select form-select-lg"
+    name="category"
+    id="cat"
+    [(ngModel)]="selectedCategoryId"
+  >
+    <option value = 0 selected>Select one</option>
+    <option *ngFor="let category of categories" [value]="category.id">
+      {{ category.name }}
+    </option>
+  </select>
+</div>
+
+<!-- <p class="text-warning" *ngIf="selectedCategoryName != 'Select one'">{{ selectedCategoryName }}</p> -->
+<p class="text-warning" *ngIf="selectedCategoryId != 0">{{ selectedCategoryId }}</p>
+
+<!-- When changing category in the controller, it will be reflected in the view -->
+<button class="btn btn-primary" (click)="changeCategoryToMobiles()">
+  Change Category to Mobiles
+</button>
+<br>
+
+<!-- Pipes -->
+Order's Date: {{ orderDate | date : "mediumDate" }}
+<br>
+
+<hr>
+<div class="bg-secondary">
+  <!-- <app-product-list sentSelectedCategory="Laptops"></app-product-list> -->
+  <!-- <app-product-list [recievedSelectedCategoryName]="selectedCategoryName"></app-product-list> -->
+  <app-product-list [recievedSelectedCategoryId]="selectedCategoryId" #x
+  (onTotalPriceChanged)="totalPriceChanged($event)"></app-product-list> 
+</div>
+<hr />
+
+<div>
+  <h3>Enter your name:</h3>
+  <input #clientNameInp type="text" class="form-control">
+</div>
+
+<button class="btn btn-primary my-3" (click)="placeOrder()">Place Order</button>
+
+<div>
+  <h3>Order Total Price: {{ recievedOrderTotalPrice | currency: "USD" }}</h3>
+  <h5>{{ recievedOrderTotalPrice | USDtoEGP : 48 | currency: "EGP" }}</h5>
+</div>

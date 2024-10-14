@@ -1,0 +1,29 @@
+<!-- <h1>{{storeDate.name}}</h1>
+
+<div>
+  <img src="{{storeDate.imgURL}}" class="collapse" id="collapseExample" alt="null">
+</div>
+
+<button class="btn btn-primary mt-3" data-bs-toggle="collapse" href="#collapseExample" aria-expanded="false" aria-controls="collapseExample">toggle image</button> -->
+
+<!-- <p>home works! {{name}}</p> -->
+
+<!-- Interpolation -->
+<img *ngIf="isImageShown" src="{{storeDate.imgURL}}" alt="notFound" class="img-fluid m-1">
+
+<!-- Event Binding -->
+<button (click)="toggleImage()" class="btn btn-primary">Toggle Image</button>
+
+<!-- Property Binding : the value of the property will be source -->
+<!-- <img [src]="storeDate.imgURL" alt="notFound" class="img-fluid m-1"> -->
+
+<h1>{{storeDate.name}}</h1>
+
+<!-- {{storeDate.branches}} -->
+<ul>
+  <!-- Structural Directives -->
+  <li *ngFor="let branch of storeDate.branches">
+    <!-- Template Input Variable -->
+    {{branch}}
+  </li>
+</ul>

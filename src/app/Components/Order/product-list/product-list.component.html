@@ -1,0 +1,241 @@
+<!-- <ul class="row list-unstyled">
+  <li *ngFor="let product of prodList" class="col-4 my-4">
+    <div class="card" style="width: 100%;">
+      <img src="{{ product.imgURL }}" class="card-img-top" alt="..." />
+      <div class="card-body">
+        <h5 class="card-title">{{ product.name }}</h5>
+        <p class="card-text">Price: {{ product.price }}$</p>
+        <a href="#" class="btn btn-primary">Go somewhere</a>
+      </div>
+    </div>
+  </li>
+</ul> -->
+
+<!-- <div class="mb-3">
+  <label for="cat" class="form-label">Category</label> -->
+  <!-- Template Reference Variable -->
+  <!-- <select class="form-select form-select-lg" name="category" id="cat" 
+  #cat (change)="setSelectedCategory(cat.value)"> -->
+
+  <!-- Event Binding -->
+  <!-- <select class="form-select form-select-lg" name="category" id="cat" 
+  (change)="setSelectedCategory2($event)"> -->
+
+  <!-- Two way binding [(ngModel)]. banana operator : [()] -->
+  <!-- It will bind the sentSelectedCategory value to select element -->
+  <!-- When changing category in the view, it will be reflected in the controller and vice versa-->
+  <!-- <select class="form-select form-select-lg" name="category" id="cat" 
+  [(ngModel)]="sentSelectedCategory"> -->
+
+  <!-- Best Practice -->
+  <!-- <select
+    class="form-select form-select-lg"
+    name="category"
+    id="cat"
+    [(ngModel)]="sentSelectedCategory"
+    (change)="filterCategories2()"
+  >
+    <option selected>Select one</option>
+    <option *ngFor="let category of categories" [value]="category.name">
+      {{ category.name }}
+    </option>
+  </select>
+</div> -->
+
+<!-- <p class="text-warning" *ngIf="sentSelectedCategory != 'Select one'">{{ sentSelectedCategory }}</p> -->
+<!-- When changing category in the controller, it will be reflected in the view -->
+<!-- <button class="btn btn-primary" (click)="changeCategoryToMobiles()">
+  Change Category to Mobiles
+</button>
+<br> -->
+
+<!-- Pipes -->
+<!-- Order's Date: {{ orderDate | date : "mediumDate" }} -->
+<br>
+
+<table class="table table-primary">
+  <thead>
+    <tr>
+      <th>ID</th>
+      <th>Name</th>
+      <th>Image</th>
+      <th>Av. Quantity</th>
+      <th>Price in USD</th>
+      <th>Price in EGP</th>
+      <th>Count</th>
+      <th>Details</th>
+      <th>Add to Cart</th>
+    </tr>
+  </thead>
+  <tbody>
+    <!-- Class Binding -->
+    <!-- product is a Template Input Variable -->
+<!--
+        - We can't use 2 structural directives on the same HTML element,
+          but we can use <ng-container> that will not refelect on the actual dom.
+        - ng-container vs ng-template vs ng-content
+          https://www.freecodecamp.org/news/everything-you-need-to-know-about-ng-template-ng-content-ng-container-and-ngtemplateoutlet-4b7b51223691/-->
+    <!-- Which approach to use to hide an element ?
+
+    - ngIf (Stuructural directives in general) change in DOM,
+      while class binding or [hidden] just change the dom element to be hidden.
+      so, use ngIF, if collection isn't changed reguraly in the runtime,
+      and use binding, if the collection is reguraly changed.
+
+    To decide which approach to use for hiding an element:
+
+    - If there are multiple changes to the collection at runtime, use [class.d-none] or [hidden]. 
+    This is because *ngIf changes the layout of the element in the DOM and this negatively impacts performance.
+
+    - If there are no changes to the collection at runtime, use *ngIf. While using [hidden] means 
+    that the element still exists in the DOM unnecessarily, *ngIf is slower but executes only once initially.
+    -->
+    <!-- <tr *ngFor="let product of prodList; index as i" 
+    [hidden] = "product.quantity === 0" ></tr> -->
+
+    <!-- trackBy used to specify iterable objects identity,
+            and so enhance the performance of ngFor in case of changes to the collection
+            ,and updated the changed object, without re-build the DOM -->
+    
+      <!-- filter rows based on selected category using class.d-none. 
+      This approach does not display the products in the correct order. -->
+    <!-- <tr *ngFor="let product of prodList; let i = index; let odd = odd;
+          trackBy: productTrackByFn"
+      [class.table-danger]="product.quantity === 0"
+      [ngClass]="{ 'table-danger': product.quantity === 0, 'text-primary': product.quantity === 0 }"
+      [class.d-none]="
+        !filterProductsByProductCategoryId(product.categoryID) &&
+        sentSelectedCategory != 'Select one' &&
+        sentSelectedCategory != ''
+      "
+      [class] = "odd ? 'table-success' : 'table-warning'"
+      > -->
+    
+    <!-- Best Practice -->
+      <!-- filter rows based on selected category by returing a filtered array with the selected
+        category. This approach displays the products in the correct order. -->
+    <tr *ngFor="let product of filterCategoriesByRecievedSelectedCategoryId(); let i = index; let odd = odd;
+          trackBy: productTrackByFn"
+      [class.table-danger]="product.quantity === 0"
+      [ngClass]="{ 'table-danger': product.quantity === 0, 'text-primary': product.quantity === 0 }"
+      [class] = "odd ? 'table-success' : 'table-warning'"
+      >
+
+      <!-- ng-container -->
+      <!-- 
+      - We can't use 2 structural directives on the same HTML element,
+        but we can use <ng-container> that will not refelect on the actual dom. -->
+      <!-- <ng-container *ngFor="let product of prodList; let i = index; let odd = odd;" >
+        <tr
+          *ngIf="product.quantity != 0"
+        > -->
+
+      <!-- Style Binding -->
+      <!-- ngStyle -->
+      <!-- safe navigation operator ? -->
+      <!-- <td [style.background-color]="product.quantity === 0 ? 'grey' : 'yellow'"> -->
+      
+      <!-- {{ product.id }} -->
+      <td [ngStyle]="{'background-color': product.quantity === 0 ? 'grey' : 'yellow', 'text-weight': product.quantity === 0 ? 'bold' : ''}">
+        {{ i+1 }}
+      </td>
+      <td>{{ product.name }}</td>
+      
+      <!-- Change the border style based on Event Binding -->
+      <!-- <td> <img style="border: 2px solid red" 
+        (mouseover)="onMouseOver($event)" (mouseout)="onMouseOut($event)" 
+        [src]="product.imgURL" alt="null" /></td> -->
+        
+      <!-- Change the border style based on Custom Structural Directive -->
+      <!-- <td><img Lightbox highlightColor = "yellow" [src]="product.imgURL" alt="null" /></td> -->
+      <!-- <td><img Lightbox = "yellow" [src]="product.imgURL" alt="null" /></td> -->
+      
+      <td><img Lightbox = "yellow" defaultColor="green" [src]="product.imgURL" alt="null" /></td>
+
+      <!-- Class Binding -->
+      <td [class]="product.quantity === 0 ? 'bg-warning' : 'bg-success'" >
+        <!-- ng-if -->
+        <!-- <div *ngIf = "product.quantity != 0 "> {{ product.quantity }} </div>
+        <div *ngIf = "product.quantity == 0 "> Out of Stock </div> -->
+
+        <!-- ng-if else + ng-template -->
+        <!-- <div *ngIf = "product.quantity != 0; else outOfStock "> {{ product.quantity }} </div>
+        <ng-template #outOfStock> Out of Stock </ng-template> -->
+
+        <!-- Best Practice -->
+        <!-- ng-switch -->
+        
+        <!-- <div [ngSwitch] = "product.quantity">
+          <div *ngSwitchCase="0"> Out of Stock </div>
+        </div> -->
+        <ng-container [ngSwitch] = "product.quantity">
+          <div *ngSwitchCase="0"> Out of Stock </div>
+          <div *ngSwitchCase="1"> last item </div>
+          <div *ngSwitchCase="2"> last 2 items </div>
+          <div *ngSwitchDefault> {{ product.quantity }} </div>
+        </ng-container>
+      </td>
+
+      <!-- Pipes -->
+      <!-- Directives are used in the html template, 
+      Pipes are used with the value to change the data format before displaying it. -->
+      <td>{{ product.price | currency: "USD" : "symbol"}}</td>
+      
+      <!-- Custom Pipe -->
+      <td>{{ product.price | USDtoEGP : 48 | currency: "EGP"}}</td>
+
+      <!-- #itemsCount is a Template Reference Variable -->
+      <td><input #itemsCount type="number" class="form-control" /></td>
+
+      <!-- <td><button
+        class="btn btn-primary"
+        (click)="openProductDetails(product.id)"
+      >
+        Details
+      </button></td> -->
+      
+      <!-- <td><a
+        name=""
+        id=""
+        class="btn btn-primary"
+        routerLink="/Products/{{ product.id }}"
+        role="button"
+        >Details</a
+      >
+      </td> -->
+      
+      <td><a
+        name=""
+        id=""
+        class="btn btn-primary"
+        [routerLink]='["/Products/", product.id]'
+        role="button"
+        >Details</a
+      >
+      </td>
+
+      <!-- Event Binding -->
+      <td>
+        <!-- <button
+          class="btn btn-primary"
+          (click)="buy(product.id, itemsCount.valueAsNumber, product.price)"
+        >
+          Buy
+        </button> -->
+        <button
+          class="btn btn-primary"
+          (click)="addToCart(product, itemsCount.valueAsNumber)"
+        >
+          Add to cart
+        </button>
+      </td>
+    </tr>
+    <!-- </ng-container> -->
+  </tbody>
+</table>
+<hr />
+
+<!-- <div>
+  <h3>Order Total Price: {{ orderTotalPrice | currency: "USD" }}</h3>
+  <h5>{{ orderTotalPrice | USDtoEGP : 48 | currency: "EGP" }}</h5>
+</div> -->
