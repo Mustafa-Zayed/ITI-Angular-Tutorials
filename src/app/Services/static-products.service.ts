@@ -76,4 +76,7 @@ export class StaticProductsService {
     return this.prodList.find(p => p.id == id);
   }
   
+  getProductIds(): number[] {
+    return this.prodList.map(p => p.id);
+  }
 }

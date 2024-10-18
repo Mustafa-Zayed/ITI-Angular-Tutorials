@@ -199,8 +199,10 @@ export class ProductListComponent implements OnInit, OnChanges {
   }
 
   openProductDetails(productId: number){
-    // this.router.navigateByUrl(`Products/${productId}`);
-    this.router.navigate(['Products', productId]);
+    // this.router.navigateByUrl(`/Products/${productId}`);
+    this.router.navigate(['/Products', productId]);
+    // this.router.navigate(['/Products'], { queryParams: { productID: productId } }); // Query String
+
   }
   
   // onMouseOver(event: Event) {
@@ -212,5 +214,8 @@ export class ProductListComponent implements OnInit, OnChanges {
   //   img.style.border = '2px solid red';
   // }
   
-  ngOnInit(): void {}
+  ngOnInit(): void {
+    // // No need for this in my case as I return the filtered method returns the filtered list not void.
+    // this.productService.getProducts(); // Get all products at the beginning of the application
+  }
 }

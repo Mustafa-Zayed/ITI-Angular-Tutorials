@@ -13,7 +13,7 @@ import { LightboxDirective } from './Directives/lightbox.directive';
 import { USDtoEGPPipe } from './Pipes/usdto-egp.pipe';
 import { OrderMasterComponent } from './Components/Order/order-master/order-master.component';
 import { StaticProductsService } from './Services/static-products.service';
-import { NotFoundComponentComponent } from './Components/NotFoundComponent/NotFoundComponent.component';
+import { NotFoundComponent } from './Components/NotFound/NotFound.component';
 import { MainLayoutComponent } from './Components/MainLayout/MainLayout.component';
 import { UserLoginComponent } from './Components/UserLogin/UserLogin.component';
 import { ProductDetailsComponent } from './Components/Order/product-details/product-details.component';
@@ -30,7 +30,7 @@ import { ProductDetailsComponent } from './Components/Order/product-details/prod
     USDtoEGPPipe,
     OrderMasterComponent,
     UserLoginComponent,
-    NotFoundComponentComponent,
+    NotFoundComponent,
     MainLayoutComponent,
     ProductDetailsComponent
   ],
