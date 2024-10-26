@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { from, Observable } from 'rxjs';
+import { asyncScheduler, from, Observable, of, scheduled } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
@@ -13,7 +13,7 @@ export class PromotionAdsService {
       'Big Discounts',
       'Sale up to 50%',
       'Check our white Friday offers',
-      // '',
+      '',
       'Special white Friday offers up to 70%',
     ];
   }
@@ -26,7 +26,7 @@ export class PromotionAdsService {
       let counter = 0;
 
       let adsTimer = setInterval(() => {
-        console.log('In interval');
+        // console.log('In interval');
         
         if (counter == this.adsList.length) 
           observer.complete();
@@ -60,4 +60,9 @@ export class PromotionAdsService {
     });
   }
 
+  getSerialAds() {
+    return scheduled(this.adsList, asyncScheduler);
+    // return of('ad1', 'ad2', 'ad3'); // deprecated
+    // return from(this.adsList); // deprecated
+  }
 }
