@@ -134,6 +134,6 @@ export class OrderMasterComponent implements OnInit, AfterViewInit {
     // this.clientNameInpElem.style.border = '2px solid red';
     
     // console.log(this.prdListCompObj.prodList);
-    console.log(this.prdListCompObj.getProducts());
+    // console.log(this.prdListCompObj.getProducts());
   }
 }
