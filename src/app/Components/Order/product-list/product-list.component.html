@@ -114,7 +114,11 @@
     <!-- Best Practice -->
       <!-- filter rows based on selected category by returing a filtered array with the selected
         category. This approach displays the products in the correct order. -->
-    <tr *ngFor="let product of filterCategoriesByRecievedSelectedCategoryId(); let i = index; let odd = odd;
+    
+    <!-- filterCategoriesByRecievedSelectedCategoryId() approach won't work with obsevables because
+      of syncronization and obsevables interfere with each other and getting infinite loop -->
+    <!-- <tr *ngFor="let product of filterCategoriesByRecievedSelectedCategoryId(); let i = index; let odd = odd; -->
+    <tr *ngFor="let product of prodList; let i = index; let odd = odd;
           trackBy: productTrackByFn"
       [class.table-danger]="product.quantity === 0"
       [ngClass]="{ 'table-danger': product.quantity === 0, 'text-primary': product.quantity === 0 }"

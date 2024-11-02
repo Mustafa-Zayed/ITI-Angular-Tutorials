@@ -1,7 +1,9 @@
-import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
+import { Component, EventEmitter, Input, OnChanges, OnDestroy, OnInit, Output, SimpleChanges } from '@angular/core';
 import { Router } from '@angular/router';
+import { Subscription } from 'rxjs';
 import { ICategory } from 'src/app/Models/icategory';
 import { IProduct } from 'src/app/Models/iproduct';
+import { ProductsService } from 'src/app/Services/products.service';
 import { StaticProductsService } from 'src/app/Services/static-products.service';
 
 @Component({
@@ -10,10 +12,10 @@ import { StaticProductsService } from 'src/app/Services/static-products.service'
   styleUrls: ['./product-list.component.scss'],
   // providers: [StaticProductsService] // This limits the service only to that component level, i.e. other components in the same module won't be able to access it. Registering a service at the component level means that each instance of the component gets its own instance of the service.
 })
-export class ProductListComponent implements OnInit, OnChanges {
+export class ProductListComponent implements OnInit, OnChanges, OnDestroy {
 
   // categories: ICategory[];
-  // prodList: IProduct[];
+  prodList: IProduct[] = [];
   orderTotalPrice: number = 0;
   // @Input()
   // recievedSelectedCategoryName: string = '';
@@ -25,8 +27,11 @@ export class ProductListComponent implements OnInit, OnChanges {
 
   cart = new Map<IProduct, number>();
 
+  subscriptions: Subscription[] = [];
 
-  constructor(private productService: StaticProductsService,
+  constructor(
+    // private staticProductService: StaticProductsService,
+    private productsService: ProductsService,
     private router: Router
   ) {
     // this.categories = [
@@ -99,17 +104,35 @@ export class ProductListComponent implements OnInit, OnChanges {
 
   }
 
+  ngOnInit(): void {
+    // // No need for this in my case as I return the filtered method returns the filtered list not void.
+    // this.staticProductService.getProducts(); // Get all products at the beginning of the application
+
+    let sub = this.productsService.getAllProducts().subscribe(prods => this.prodList = prods);
+    this.subscriptions.push(sub)
+  }
+  
   ngOnChanges(): void {
     // No need for this in my case as I return the filtered method returns the filtered list not void.
     // this.filterCategoriesByRecievedSelectedCategoryName();
     // this.filterCategoriesByRecievedSelectedCategoryId();
 
-    // this.productService.getProductsByCategoryID(this.recievedSelectedCategoryId);
+    // this.prodList = this.staticProductService.getProductsByCategoryID(this.recievedSelectedCategoryId);
+    
+    this.filterCategoriesByRecievedSelectedCategoryId2();
+  }
+
+  ngOnDestroy(): void {
+    this.subscriptions.forEach(sub => sub.unsubscribe());
   }
 
   buy(productId: number, itemsCount: number, productPrice: number) {
     // let p: IProduct | undefined = this.prodList.find((p) => p.id === productId);
-    let p: IProduct | undefined = this.productService.getProductById(productId);
+    // let p: IProduct | undefined = this.staticProductService.getProductById(productId);
+    let p: IProduct | undefined;
+    this.productsService.getProductById(productId).subscribe((prd) => {
+      p = prd;
+    });
     if (p) {
       if (p.quantity > 0 && p.quantity >= itemsCount && itemsCount > 0) {
         p.quantity -= itemsCount;
@@ -183,8 +206,18 @@ export class ProductListComponent implements OnInit, OnChanges {
   //   return this.prodList.filter(p => p.categoryID == this.recievedSelectedCategoryId);
   // }
 
-  filterCategoriesByRecievedSelectedCategoryId() : IProduct[] {
-    return this.productService.getProductsByCategoryID(this.recievedSelectedCategoryId);
+  ////
+
+  // filterCategoriesByRecievedSelectedCategoryId() : IProduct[] {
+  //   return this.staticProductService.getProductsByCategoryID(this.recievedSelectedCategoryId);
+  // }
+
+  filterCategoriesByRecievedSelectedCategoryId2() {
+    
+    let sub = this.productsService.getProductsByCategoryId(this.recievedSelectedCategoryId).subscribe(
+      (prds) => {this.prodList = prds;}
+    );
+    this.subscriptions.push(sub);
   }
 
   // This function is optionally passed into the NgForOf directive to customize how
@@ -195,7 +228,13 @@ export class ProductListComponent implements OnInit, OnChanges {
   }
 
   getProducts() : IProduct[] {
-    return this.productService.getProducts();
+    // return this.staticProductService.getProducts();
+
+    let products: IProduct[] = [];
+    this.productsService.getAllProducts().subscribe((prds) => {
+      products = prds;
+    });
+    return products;
   }
 
   openProductDetails(productId: number){
@@ -214,8 +253,4 @@ export class ProductListComponent implements OnInit, OnChanges {
   //   img.style.border = '2px solid red';
   // }
   
-  ngOnInit(): void {
-    // // No need for this in my case as I return the filtered method returns the filtered list not void.
-    // this.productService.getProducts(); // Get all products at the beginning of the application
-  }
 }

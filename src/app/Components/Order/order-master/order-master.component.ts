@@ -1,16 +1,18 @@
-import { AfterViewInit, Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { ICategory } from 'src/app/Models/icategory';
 import { IProduct } from 'src/app/Models/iproduct';
 import { ProductListComponent } from '../product-list/product-list.component';
+import { ProductsService } from 'src/app/Services/products.service';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-order-master',
   templateUrl: './order-master.component.html',
   styleUrls: ['./order-master.component.scss']
 })
-export class OrderMasterComponent implements OnInit, AfterViewInit {
+export class OrderMasterComponent implements OnInit, AfterViewInit, OnDestroy {
 
-  categories: ICategory[];
+  categories: ICategory[] = [];
   // prodList: IProduct[];
   // selectedCategoryName: string = '';
   selectedCategoryId: number = 0;
@@ -27,21 +29,22 @@ export class OrderMasterComponent implements OnInit, AfterViewInit {
   @ViewChild(ProductListComponent) prdListCompObj!: ProductListComponent; // Non-null asseration operator
   // @ViewChild('x') prdListCompObj!: ProductListComponent; // Non-null asseration operator
 
-  constructor() {
-    this.categories = [
-      {
-        id: 1,
-        name: 'Laptops',
-      },
-      {
-        id: 2,
-        name: 'Tablets',
-      },
-      {
-        id: 3,
-        name: 'Mobiles',
-      },
-    ];
+  subscriptions: Subscription[] = [];
+  constructor(private productsService : ProductsService) {
+    // this.categories = [
+    //   {
+    //     id: 1,
+    //     name: 'Laptops',
+    //   },
+    //   {
+    //     id: 2,
+    //     name: 'Tablets',
+    //   },
+    //   {
+    //     id: 3,
+    //     name: 'Mobiles',
+    //   },
+    // ];
     // this.prodList = [
     //   {
     //     id: 100,
@@ -92,6 +95,30 @@ export class OrderMasterComponent implements OnInit, AfterViewInit {
     //     categoryID: 3,
     //   },
     // ];
+
+    let sub : Subscription = this.productsService.getAllCategories().subscribe((cat) => {
+      this.categories = cat;
+    });
+
+    this.subscriptions.push(sub);
+  }
+
+  ngOnInit(): void {
+  }
+
+  ngAfterViewInit(): void {
+    // this.clientNameInpElem.nativeElement.value = 'Enter your name';
+    this.clientNameInpElem.nativeElement.placeholder = 'Enter your name';
+    this.clientNameInpElem.nativeElement.style.border = '2px solid red';
+    // this.clientNameInpElem.innerText = 'Enter your name';
+    // this.clientNameInpElem.style.border = '2px solid red';
+    
+    // console.log(this.prdListCompObj.prodList);
+    // console.log(this.prdListCompObj.getProducts());
+  }
+
+  ngOnDestroy(): void {
+    this.subscriptions.forEach(sub => sub.unsubscribe());
   }
 
   totalPriceChanged(totalPrice: number) {
@@ -112,8 +139,10 @@ export class OrderMasterComponent implements OnInit, AfterViewInit {
     //   alert('No items left');
 
     // let prodList: IProduct[] = this.prdListCompObj.prodList;
-    let prodList: IProduct[] = this.prdListCompObj.getProducts();
+    let prodList: IProduct[] = this.prdListCompObj.prodList;
     let cart = this.prdListCompObj.cart;
+
+    console.log('cart: ',cart);
 
     for (const [product, quantity] of cart.entries()) {
       prodList.find((p) => p.id === product.id)!.quantity -= quantity;
@@ -123,17 +152,5 @@ export class OrderMasterComponent implements OnInit, AfterViewInit {
     cart.clear();
   }
 
-  ngOnInit(): void {
-  }
-
-  ngAfterViewInit(): void {
-    // this.clientNameInpElem.nativeElement.value = 'Enter your name';
-    this.clientNameInpElem.nativeElement.placeholder = 'Enter your name';
-    this.clientNameInpElem.nativeElement.style.border = '2px solid red';
-    // this.clientNameInpElem.innerText = 'Enter your name';
-    // this.clientNameInpElem.style.border = '2px solid red';
-    
-    // console.log(this.prdListCompObj.prodList);
-    // console.log(this.prdListCompObj.getProducts());
-  }
+  
 }
