@@ -1,0 +1,9 @@
+<button class="btn btn-primary m-3" (click)="addProduct()">Save</button>
+
+<div *ngIf="successAlert" class="alert alert-primary" role="alert">
+  Product Added Successfully
+</div>
+
+<div *ngIf="failedAlert" class="alert alert-danger" role="alert">
+  Failed to Add Product
+</div>
