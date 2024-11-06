@@ -8,41 +8,16 @@ import {
 import { catchError, Observable, retry, throwError } from 'rxjs';
 import { environment } from 'src/environments/environment';
 import { ICategory } from '../Models/icategory';
+import { GenericAPIHandlerService } from './generic-apihandler.service';
+import { APIResponseViewModel } from '../ViewModels/apiresponse-view-model';
 
 @Injectable({
   providedIn: 'root',
 })
 export class ProductsService {
-  httpOptions;
 
-  constructor(private httpClient: HttpClient) {
-    this.httpOptions = {
-      headers: new HttpHeaders({
-        'Content-Type': 'application/json',
-        // Authorization: 'my-auth-token'
-      }),
-    };
-  }
+  constructor(private genericAPI:GenericAPIHandlerService) {}
 
-  private handleError(error: HttpErrorResponse) {
-    // Generic Error handler
-    if (error.status === 0) {
-      // A client-side or network error occurred. Handle it accordingly.
-      console.error('An error occurred:', error.error);
-    } else {
-      // The backend returned an unsuccessful response code.
-      // The response body may contain clues as to what went wrong.
-      console.error(
-        `Backend returned code ${error.status}, body was: `,
-        error.error
-      );
-    }
-    // Write error details in Generic error log
-    // may be an API call or a DB call to retrieve error details
-
-    // Return an observable with a user-facing error message.
-    return throwError(() => new Error('Error occured, please try again'));
-  }
 
   getProductIds(): number[] {
     let prdIds: number[] = [];
@@ -54,55 +29,35 @@ export class ProductsService {
   }
 
   getAllProducts(): Observable<IProduct[]> {
-    return this.httpClient
-      .get<IProduct[]>(`${environment.APIURL}/products`)
-      .pipe(retry(2), catchError(this.handleError));
+    return this.genericAPI.getAll<IProduct[]>('products');
   }
 
   getAllCategories(): Observable<ICategory[]> {
-    return this.httpClient
-      .get<ICategory[]>(`${environment.APIURL}/categories`)
-      .pipe(retry(2), catchError(this.handleError));
+    return this.genericAPI.getAll<ICategory[]>('categories');
   }
 
   getProductsByCategoryId(categoryId: number): Observable<IProduct[]> {
-    if (categoryId == 0) return this.getAllProducts();
+    return this.genericAPI.getProductsByCategoryId(categoryId);
+  }
 
-    return this.httpClient
-      .get<IProduct[]>(
-        `${environment.APIURL}/products?categoryID=${categoryId}`
-      )
-      .pipe(retry(2), catchError(this.handleError));
+  // getItems() returns an observable of type APIResponseViewModel which has a statndard structure
+  getItems(categoryId: number): Observable<APIResponseViewModel> {
+    return this.genericAPI.getItems('products', { categoryID: categoryId });
   }
 
   getProductById(productId: number): Observable<IProduct> {
-    return this.httpClient
-      .get<IProduct>(`${environment.APIURL}/products/${productId}`)
-      .pipe(retry(2), catchError(this.handleError));
+    return this.genericAPI.getById<IProduct>('products',productId);
   }
 
   addProduct(product: IProduct): Observable<IProduct> {
-    return this.httpClient
-      .post<IProduct>(
-        `${environment.APIURL}/products`,
-        JSON.stringify(product),
-        this.httpOptions
-      )
-      .pipe(retry(2), catchError(this.handleError));
+    return this.genericAPI.post<IProduct>('products', product);
   }
 
   updateProduct(product: IProduct): Observable<IProduct> {
-    return this.httpClient.put<IProduct>(
-      `${environment.APIURL}/products`,
-      JSON.stringify(product),
-      this.httpOptions
-    );
+    return this.genericAPI.put<IProduct>('products', product);
   }
 
   deleteProduct(productId: number): Observable<IProduct> {
-    return this.httpClient.delete<IProduct>(
-      `${environment.APIURL}/products/${productId}`,
-      this.httpOptions
-    );
+    return this.genericAPI.delete<IProduct>('products', productId);
   }
 }

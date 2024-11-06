@@ -1,10 +1,20 @@
-import { Component, EventEmitter, Input, OnChanges, OnDestroy, OnInit, Output, SimpleChanges } from '@angular/core';
+import {
+  Component,
+  EventEmitter,
+  Input,
+  OnChanges,
+  OnDestroy,
+  OnInit,
+  Output,
+  SimpleChanges,
+} from '@angular/core';
 import { Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { ICategory } from 'src/app/Models/icategory';
 import { IProduct } from 'src/app/Models/iproduct';
 import { ProductsService } from 'src/app/Services/products.service';
 import { StaticProductsService } from 'src/app/Services/static-products.service';
+import { APIResponseViewModel } from 'src/app/ViewModels/apiresponse-view-model';
 
 @Component({
   selector: 'app-product-list',
@@ -13,7 +23,6 @@ import { StaticProductsService } from 'src/app/Services/static-products.service'
   // providers: [StaticProductsService] // This limits the service only to that component level, i.e. other components in the same module won't be able to access it. Registering a service at the component level means that each instance of the component gets its own instance of the service.
 })
 export class ProductListComponent implements OnInit, OnChanges, OnDestroy {
-
   // categories: ICategory[];
   prodList: IProduct[] = [];
   orderTotalPrice: number = 0;
@@ -101,29 +110,30 @@ export class ProductListComponent implements OnInit, OnChanges, OnDestroy {
     // ];
 
     this.onTotalPriceChanged = new EventEmitter<number>();
-
   }
 
   ngOnInit(): void {
     // // No need for this in my case as I return the filtered method returns the filtered list not void.
     // this.staticProductService.getProducts(); // Get all products at the beginning of the application
 
-    let sub = this.productsService.getAllProducts().subscribe(prods => this.prodList = prods);
-    this.subscriptions.push(sub)
+    let sub = this.productsService
+      .getAllProducts()
+      .subscribe((prods) => (this.prodList = prods));
+    this.subscriptions.push(sub);
   }
-  
+
   ngOnChanges(): void {
     // No need for this in my case as I return the filtered method returns the filtered list not void.
     // this.filterCategoriesByRecievedSelectedCategoryName();
     // this.filterCategoriesByRecievedSelectedCategoryId();
 
     // this.prodList = this.staticProductService.getProductsByCategoryID(this.recievedSelectedCategoryId);
-    
+
     this.filterCategoriesByRecievedSelectedCategoryId2();
   }
 
   ngOnDestroy(): void {
-    this.subscriptions.forEach(sub => sub.unsubscribe());
+    this.subscriptions.forEach((sub) => sub.unsubscribe());
   }
 
   buy(productId: number, itemsCount: number, productPrice: number) {
@@ -145,16 +155,20 @@ export class ProductListComponent implements OnInit, OnChanges, OnDestroy {
     }
   }
 
-  addToCart(p: IProduct, itemsCount: number){
+  addToCart(p: IProduct, itemsCount: number) {
     const productQuantityInCart = this.cart.get(p) || 0;
     console.log(productQuantityInCart);
 
     // const productQuantity = this.cart.get(p);
 
-    if (p.quantity > 0 && p.quantity >= itemsCount && itemsCount > 0 
-      && productQuantityInCart + itemsCount <= p.quantity) {
-        this.cart.set(p, productQuantityInCart + itemsCount);
-        console.log(this.cart);
+    if (
+      p.quantity > 0 &&
+      p.quantity >= itemsCount &&
+      itemsCount > 0 &&
+      productQuantityInCart + itemsCount <= p.quantity
+    ) {
+      this.cart.set(p, productQuantityInCart + itemsCount);
+      console.log(this.cart);
     }
   }
 
@@ -213,21 +227,34 @@ export class ProductListComponent implements OnInit, OnChanges, OnDestroy {
   // }
 
   filterCategoriesByRecievedSelectedCategoryId2() {
-    
-    let sub = this.productsService.getProductsByCategoryId(this.recievedSelectedCategoryId).subscribe(
-      (prds) => {this.prodList = prds;}
-    );
+    // let sub = this.productsService.getProductsByCategoryId(this.recievedSelectedCategoryId).subscribe(
+    //   (prds) => {this.prodList = prds;}
+    // );
+    // this.subscriptions.push(sub);
+
+    // getItems() returns an observable of type APIResponseViewModel which has a statndard structure
+    let sub = this.productsService
+      .getItems(this.recievedSelectedCategoryId)
+      .subscribe((apiResponseViewModel : APIResponseViewModel) => {
+        if (apiResponseViewModel.success) {
+          this.prodList = apiResponseViewModel.data;
+          console.log('Success Response:', apiResponseViewModel);
+        } else {
+          console.log('Error Response:', apiResponseViewModel);
+        }
+      });
+
     this.subscriptions.push(sub);
   }
 
   // This function is optionally passed into the NgForOf directive to customize how
   // NgForOf uniquely identifies items in an iterable  when items in the iterable are
   // reordered, new items are added, or existing items are removed..
-  productTrackByFn(index: number, product: IProduct){
+  productTrackByFn(index: number, product: IProduct) {
     return product.id;
   }
 
-  getProducts() : IProduct[] {
+  getProducts(): IProduct[] {
     // return this.staticProductService.getProducts();
 
     let products: IProduct[] = [];
@@ -237,13 +264,12 @@ export class ProductListComponent implements OnInit, OnChanges, OnDestroy {
     return products;
   }
 
-  openProductDetails(productId: number){
+  openProductDetails(productId: number) {
     // this.router.navigateByUrl(`/Products/${productId}`);
     this.router.navigate(['/Products', productId]);
     // this.router.navigate(['/Products'], { queryParams: { productID: productId } }); // Query String
-
   }
-  
+
   // onMouseOver(event: Event) {
   //   let img = event.target as HTMLImageElement;
   //   img.style.border = '3px solid yellow';
@@ -252,5 +278,4 @@ export class ProductListComponent implements OnInit, OnChanges, OnDestroy {
   //   let img = event.target as HTMLImageElement;
   //   img.style.border = '2px solid red';
   // }
-  
 }
