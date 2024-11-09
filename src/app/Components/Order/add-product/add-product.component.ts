@@ -1,6 +1,7 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { Observer, Subscription, tap } from 'rxjs';
+import { ICategory } from 'src/app/Models/icategory';
 import { IProduct } from 'src/app/Models/iproduct';
 import { ProductsService } from 'src/app/Services/products.service';
 
@@ -14,10 +15,20 @@ export class AddProductComponent implements OnInit, OnDestroy {
   private observer: Observer<IProduct>;
   successAlert: boolean = false;
   failedAlert: boolean = false;
+  productId: number = 0;
+
+  newProduct: IProduct = {
+    // set the default value to null which is a value that Angular's required validator
+    // considers invalid, and to match the selected option in the dropdown list
+    categoryID: null,
+  } as unknown as IProduct;
+
+  catList: ICategory[] = [];
 
   constructor(
     private productsService: ProductsService,
-    private router: Router
+    private router: Router,
+    private activatedRoute: ActivatedRoute
   ) {
     this.observer = {
       next: (product: IProduct) => {
@@ -38,22 +49,36 @@ export class AddProductComponent implements OnInit, OnDestroy {
       },
       complete: () => console.log('Completed!'),
     };
+
+    this.productsService.getAllCategories().subscribe((catArr) => {
+      this.catList = catArr;
+    });
   }
 
-  ngOnInit(): void {}
+  ngOnInit(): void {
+    this.activatedRoute.paramMap.subscribe((params) => {
+      this.productId = Number(params.get('productID'));
 
-  addProduct() {
-    const newProduct: IProduct = {
-      id: 200,
-      name: 'Added Product',
-      price: 1000,
-      imgURL: 'https://picsum.photos/300/200',
-      quantity: 3,
-      categoryID: 1,
-    };
+      // console.log(this.productId);
+      if (this.productId == 0) return;
+
+      let sub = this.productsService
+        .getProductById(this.productId)
+        .subscribe((product) => (this.newProduct = product));
+      this.subscriptions.push(sub);
+    });
+  }
+
+  addOrUpdateProduct() {
+    // if there's no productID, then it's a new product
+    if (this.productId == 0) {
+      let sub = this.productsService
+        .addProduct(this.newProduct)
+        .subscribe(this.observer);
+    }
 
     let sub = this.productsService
-      .addProduct(newProduct)
+      .updateProduct(this.newProduct)
       .subscribe(this.observer);
 
     this.subscriptions.push(sub);

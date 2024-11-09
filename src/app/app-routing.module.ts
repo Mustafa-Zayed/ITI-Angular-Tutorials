@@ -19,6 +19,7 @@ const routes: Routes = [ // First-match wins strategy, i.e. order matters
       {path: 'Products/:productID', component: ProductDetailsComponent}, // Dynamic/Parameterized route/path
       // {path: 'Products', component: ProductDetailsComponent}, // query string
       {path: 'Product/Add', component: AddProductComponent},
+      {path: 'Product/Add/:productID', component: AddProductComponent},
       {path: 'Order', component: OrderMasterComponent, canActivate: [AuthGuard]},
     ]},
     {path: 'Login', component: UserLoginComponent},

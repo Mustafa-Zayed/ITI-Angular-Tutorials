@@ -1,5 +1,6 @@
 import {
   Component,
+  ElementRef,
   EventEmitter,
   Input,
   OnChanges,
@@ -7,6 +8,7 @@ import {
   OnInit,
   Output,
   SimpleChanges,
+  ViewChild,
 } from '@angular/core';
 import { Router } from '@angular/router';
 import { Subscription } from 'rxjs';
@@ -37,6 +39,11 @@ export class ProductListComponent implements OnInit, OnChanges, OnDestroy {
   cart = new Map<IProduct, number>();
 
   subscriptions: Subscription[] = [];
+
+  productIdToDelete: number | null = null;
+
+  // Reference to the modal element
+  @ViewChild('deleteModal') deleteModal!: ElementRef;
 
   constructor(
     // private staticProductService: StaticProductsService,
@@ -235,7 +242,7 @@ export class ProductListComponent implements OnInit, OnChanges, OnDestroy {
     // getItems() returns an observable of type APIResponseViewModel which has a statndard structure
     let sub = this.productsService
       .getItems(this.recievedSelectedCategoryId)
-      .subscribe((apiResponseViewModel : APIResponseViewModel) => {
+      .subscribe((apiResponseViewModel: APIResponseViewModel) => {
         if (apiResponseViewModel.success) {
           this.prodList = apiResponseViewModel.data;
           console.log('Success Response:', apiResponseViewModel);
@@ -268,6 +275,41 @@ export class ProductListComponent implements OnInit, OnChanges, OnDestroy {
     // this.router.navigateByUrl(`/Products/${productId}`);
     this.router.navigate(['/Products', productId]);
     // this.router.navigate(['/Products'], { queryParams: { productID: productId } }); // Query String
+  }
+
+  // deleteProduct(productId: number) {
+  //   // alert('Are you sure you want to delete this product?');
+  //   this.productsService.deleteProduct(productId).subscribe(() => {
+  //     console.log('Deleted product with id: ' + productId);
+  //     this.prodList = this.prodList.filter((p) => p.id !== productId);
+  //     // this.prodList=this.getProducts();
+  //   })
+  // }
+
+  /**
+   * Modal is decoupled from the table. When the "Delete" button is clicked, the modal does not
+   * inherently know which product was selected. Storing the product ID ensures that the modal is
+   * aware of the product associated with the delete action.
+   * The modal opens as a separate UI element. If you don't store the product ID, the modal would
+   * have no way of knowing which product to delete when the user clicks "Confirm Delete."
+   * Storing the ID bridges this gap.
+   */
+  setProductIdToDelete(productId: number): void {
+    this.productIdToDelete = productId;
+  }
+
+  confirmDelete(): void {
+    if (this.productIdToDelete !== null) {
+      let sub = this.productsService
+        .deleteProduct(this.productIdToDelete)
+        .subscribe(() => {
+          console.log('Deleted product with id: ' + this.productIdToDelete);
+          this.prodList = this.prodList.filter(
+            (p) => p.id !== this.productIdToDelete
+          );
+          this.productIdToDelete = null;
+        });
+    }
   }
 
   // onMouseOver(event: Event) {

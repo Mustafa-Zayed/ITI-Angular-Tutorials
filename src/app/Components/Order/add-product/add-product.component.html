@@ -1,4 +1,160 @@
-<button class="btn btn-primary m-3" (click)="addProduct()">Save</button>
+<!-- <button class="btn btn-primary m-3" (click)="addOrUpdateProduct()">Save</button> -->
+
+<div class="text-danger my-3">
+  <h3>To be removed [for testing]</h3>
+  <div>
+    {{ newProduct | json }}
+  </div>
+  <div>
+    <!-- {{prdNameInp.className | json}} -->
+    {{ prdNameInp.errors | json }}
+  </div>
+</div>
+<hr />
+<!-- if you want to customize your form a bit more like doing more validation and do other stuff
+  like a custom http request, you should remove action and method attributes and prevent
+  the default behavior of form otherwise the page will be refreshed after submit.
+  ngSubmit will prevent the default behavior -->
+<form #prdForm="ngForm" class="mb-3" (ngSubmit)="addOrUpdateProduct()">
+  <div class="mb-3">
+    <label for="pName" class="form-label">Product Name</label>
+    <input
+      #prdNameInp="ngModel"
+      type="text"
+      class="form-control"
+      id="pName"
+      name="prdname"
+      [(ngModel)]="newProduct.name"
+      required
+      pattern="[A-Za-z0-9 ]{3,}"
+    />
+
+    <div
+      class="alert alert-warning my-2"
+      [hidden]="prdNameInp.valid || prdNameInp.untouched"
+    >
+      <small *ngIf="prdNameInp.errors?.['required']"> Name is required</small>
+      <small *ngIf="prdNameInp.errors?.['pattern']">
+        Name must be 3 letters at least</small
+      >
+    </div>
+  </div>
+
+  <div class="mb-3">
+    <label for="pPrice" class="form-label"
+      >Product Price: {{ newProduct.price | currency }}</label
+    >
+    <input
+      #prdPriceInp="ngModel"
+      type="number"
+      class="form-control"
+      id="pPrice"
+      name="prdprice"
+      [(ngModel)]="newProduct.price"
+      required
+      min="0"
+    />
+
+    <div
+      class="alert alert-warning my-2"
+      [hidden]="prdPriceInp.valid || prdPriceInp.untouched"
+    >
+      <small *ngIf="prdPriceInp.errors?.['required']"> Price is required</small>
+      <small *ngIf="prdPriceInp.errors?.['min']">
+        Price must be greater than or equal 0</small
+      >
+    </div>
+  </div>
+
+  <div class="mb-3">
+    <label for="pQuantity" class="form-label">Product Quantity</label>
+    <input
+      #prdQuantityInp="ngModel"
+      type="number"
+      class="form-control"
+      id="pQuantity"
+      name="prdquant"
+      [(ngModel)]="newProduct.quantity"
+      required
+      min="0"
+    />
+
+    <div
+      class="alert alert-warning my-2"
+      [hidden]="prdQuantityInp.valid || prdQuantityInp.untouched"
+    >
+      <small *ngIf="prdQuantityInp.errors?.['required']">
+        Quantity is required</small
+      >
+      <small *ngIf="prdQuantityInp.errors?.['min']">
+        Quantity must be greater than or equal 0</small
+      >
+    </div>
+  </div>
+
+  <div class="mb-3">
+    <label for="prdCat" class="form-label">Product Category</label>
+    <select
+      #prdCatInp="ngModel"
+      id="prdCat"
+      class="form-select"
+      [class.ng-invalid]="prdCatInp.value == null"
+      name="cat"
+      [(ngModel)]="newProduct.categoryID"
+      required
+    >
+      <!-- Angular’s required validator will work as expected because null is treated as
+      invalid for the field. -->
+      <option [value]="null" disabled>Select one</option>
+      <option *ngFor="let cat of catList" [value]="cat.id">
+        {{ cat.name }}
+      </option>
+    </select>
+
+    <div
+      class="alert alert-warning my-2"
+      [hidden]="prdCatInp.valid || prdCatInp.untouched"
+    >
+      <small *ngIf="prdCatInp.errors?.['required']">
+        Category is required</small
+      >
+      <small *ngIf="prdCatInp.value == 0"> Category is required</small>
+    </div>
+  </div>
+
+  <div class="mb-3">
+    <label for="pImg" class="form-label">Product Image</label>
+    <input
+      #prdImgInp="ngModel"
+      type="file"
+      accept="image/png, image/jpeg"
+      class="form-control"
+      id="pImg"
+      name="prdimg"
+      [(ngModel)]="newProduct.imgURL"
+      required
+    />
+
+    <div
+      class="alert alert-warning my-2"
+      [hidden]="prdImgInp.valid || prdImgInp.untouched"
+    >
+      <small *ngIf="prdImgInp.errors?.['required']"> Image is required</small>
+    </div>
+  </div>
+
+  <button
+    #submitBtn
+    type="submit"
+    class="btn btn-primary"
+    [disabled]="prdForm.invalid"
+  >
+    Submit
+  </button>
+  <small class="form-text text-muted" *ngIf="submitBtn.disabled">
+    Please fill all the required fields
+  </small>
+</form>
 
 <div *ngIf="successAlert" class="alert alert-primary" role="alert">
   Product Added Successfully

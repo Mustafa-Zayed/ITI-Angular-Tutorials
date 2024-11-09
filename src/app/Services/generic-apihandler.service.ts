@@ -133,7 +133,7 @@ export class GenericAPIHandlerService {
   put<T>(endPoint: string, data: any): Observable<T> {
     return this.httpClient
       .put<T>(
-        `${environment.APIURL}/${endPoint}`,
+        `${environment.APIURL}/${endPoint}/${data.id}`,
         JSON.stringify(data),
         this.httpOptions
       )
