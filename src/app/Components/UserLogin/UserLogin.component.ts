@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { UserAuthService } from 'src/app/Services/user-auth.service';
 
 @Component({
@@ -10,12 +10,17 @@ import { UserAuthService } from 'src/app/Services/user-auth.service';
 export class UserLoginComponent implements OnInit {
 
   isUserLoggedIn : boolean = false;
-  constructor(private userAuthService : UserAuthService
+  returnUrl: string = '/';
+
+  constructor(private activatedRoute: ActivatedRoute,private userAuthService : UserAuthService
     ,private router : Router
   ) { }
 
   ngOnInit() {
     this.isUserLoggedIn= this.userAuthService.isUserLoggedIn;
+
+    // Get the return URL from the query parameters or default to '/'
+    this.returnUrl = this.activatedRoute.snapshot.queryParams['returnUrl'] || '/';
   }
 
   login() {
@@ -26,7 +31,10 @@ export class UserLoginComponent implements OnInit {
     // isUserLoggedIn property in the login() and logout() in user-auth.service instead of here.
     this.isUserLoggedIn= this.userAuthService.isUserLoggedIn;
 
-    this.router.navigate(['Login']); 
+    // this.router.navigate(['Login']); 
+
+    // Redirect to the intended URL or '/' if the intended URL is not available
+    this.router.navigate([this.returnUrl]); 
   }
 
   logout() {

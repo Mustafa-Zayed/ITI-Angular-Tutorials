@@ -17,7 +17,6 @@ export class AuthGuard implements CanActivate {
 
   constructor(private userAuthService: UserAuthService,
     private router: Router) {
-    
   }
 
   canActivate(
@@ -29,7 +28,15 @@ export class AuthGuard implements CanActivate {
       return true;
     else{
       alert("Please login first");
-      this.router.navigate(['Login']);
+      
+      // Store the attempted URL for redirecting after login
+      this.router.navigate(['/Login'], { 
+        queryParams: { returnUrl: state.url } 
+      });
+      // console.log(state.url);
+      // console.log(route.url);
+      // console.log(this.router.url);
+
       return false;
     }
   }
