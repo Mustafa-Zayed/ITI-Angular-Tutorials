@@ -1,0 +1,412 @@
+<div class="container">
+  <div class="text-danger">
+    <h3>To be removed [for testing]</h3>
+    <div>
+      {{ userRegisterForm.value | json }}
+    </div>
+    <div>
+      <!-- {{ userRegisterForm.get("fullName")?.errors | json }} -->
+      <!-- {{ fullName?.errors | json }} -->
+      <!-- {{ fullName?.pristine | json }} -->
+    </div>
+    <!-- <div>
+      <button class="btn btn-secondary my-3" (click)="fillForm()">Fill Form</button>
+    </div> -->
+  </div>
+  <hr />
+
+  <form [formGroup]="userRegisterForm" class="m-3" (ngSubmit)="register()">
+    <div class="mb-3">
+      <label for="fname" class="form-label">Full Name</label>
+      <input
+        type="text"
+        formControlName="fullName"
+        class="form-control"
+        id="fname"
+        name="fname"
+        [class.is-valid]="fullName?.valid && fullName?.dirty"
+        [class.is-invalid]="fullName?.invalid && fullName?.dirty"
+      />
+      <!-- is-valid, is-invalid are named visual feedback classes from bootstrap -->
+      <div
+        class="alert alert-warning my-2"
+        [hidden]="fullName?.valid || fullName?.pristine"
+      >
+        <small *ngIf="fullName?.errors?.['required']"> Name is required</small>
+        <small *ngIf="fullName?.errors?.['pattern']">
+          Name must be 3 letters at least,
+          <b>{{fullName?.errors?.['pattern'].actualValue}}</b> doesn't
+          match</small
+        >
+      </div>
+    </div>
+
+    <div class="mb-3">
+      <label for="email" class="form-label">Email</label>
+      <input
+        type="email"
+        formControlName="email"
+        class="form-control"
+        id="email"
+        name="email"
+        [class.is-valid]="email?.valid && email?.dirty"
+        [class.is-invalid]="email?.invalid && email?.dirty"
+      />
+      <div
+        class="alert alert-warning my-2"
+        [hidden]="email?.valid || email?.pristine"
+      >
+        <small *ngIf="email?.errors?.['required']">Email is required</small>
+        <small *ngIf="email?.errors?.['email']">Email is not valid</small>
+        <!-- <small *ngIf="email?.errors?.['EmailNotValid']">Email must contain &#64;, <b>{{email?.errors?.['EmailNotValid'].value}}</b> doesn't match</small> -->
+        <small *ngIf="email?.errors?.['ExistedEmail']"
+          >Email already exists,
+          <b>{{email?.errors?.['ExistedEmail'].value}}</b> can't be used</small
+        >
+      </div>
+    </div>
+
+    <ng-container formArrayName="phoneNo">
+      <div
+        class="mb-3"
+        *ngFor="
+          let phone of phoneNoArray.controls;
+          let i = index;
+          let first = first;
+          let last = last
+        "
+      >
+        <label for="phone {{ i + 1 }}" class="form-label"
+          >Phone No. #{{ i + 1 }}</label
+        >
+        <!-- <div class="row mb-2 align-items-center">
+          <div class="col">
+            <input
+              type="text"
+              [formControlName]="i"
+              class="form-control"
+              id="phone {{ i + 1 }}"
+              name="phone {{ i + 1 }}"
+            />
+          </div>
+          <div class="col-auto">
+            <button class="btn btn-primary" (click)="addPhoneNo($event)">+</button>
+          </div>
+        </div> -->
+
+        <div class="d-flex align-items-center mb-2">
+          <input
+            type="text"
+            [formControlName]="i"
+            class="form-control me-2"
+            id="phone {{ i + 1 }}"
+            name="phone {{ i + 1 }}"
+            [class.is-valid]="phone.value.length == 11 && phone?.dirty"
+            [class.is-invalid]="phone.value.length != 11 && phone?.dirty"
+          />
+
+          <button
+            [disabled]="phone.value.length != 11"
+            *ngIf="last"
+            class="btn btn-primary me-2"
+            (click)="addPhoneNo()"
+          >
+            +
+          </button>
+
+          <button
+            *ngIf="!first"
+            class="btn btn-danger"
+            (click)="removePhoneNo(i)"
+          >
+            -
+          </button>
+        </div>
+
+        <div
+          class="alert alert-warning my-2"
+          [hidden]="phone?.pristine || phone?.value?.length == 11"
+        >
+          <small *ngIf="phone?.errors?.['required']">
+            Phone No. is required
+          </small>
+          <!-- <small *ngIf="phone?.errors?.['min']">
+          Phone No. must be 11 digits
+        </small> -->
+          <small *ngIf="phone?.value?.length != 11 && phone?.value?.length > 0">
+            Phone No. must be 11 digits, <b>{{ phone?.value }}</b> with
+            {{ phone?.value?.length }} digits doesn't match
+          </small>
+        </div>
+      </div>
+    </ng-container>
+
+    <div formGroupName="address">
+      <div class="mb-3">
+        <label for="city" class="form-label">City</label>
+        <input
+          type="text"
+          formControlName="city"
+          class="form-control"
+          id="city"
+          name="city"
+          [class.is-valid]="
+            address?.get('city')?.valid && address?.get('city')?.dirty
+          "
+          [class.is-invalid]="
+            address?.get('city')?.invalid && address?.get('city')?.dirty
+          "
+        />
+        <div
+          class="alert alert-warning my-2"
+          [hidden]="
+            address?.get('city')?.valid || address?.get('city')?.pristine
+          "
+        >
+          <small *ngIf="address?.get('city')?.errors?.['required']">
+            City is required
+          </small>
+        </div>
+      </div>
+
+      <div class="mb-3">
+        <label for="postalCode" class="form-label">Postal Code</label>
+        <input
+          type="text"
+          formControlName="postalCode"
+          class="form-control"
+          id="postalCode"
+          name="postalCode"
+          [class.is-valid]="
+            address?.get('postalCode')?.valid &&
+            address?.get('postalCode')?.dirty
+          "
+          [class.is-invalid]="
+            address?.get('postalCode')?.invalid &&
+            address?.get('postalCode')?.dirty
+          "
+        />
+        <div
+          class="alert alert-warning my-2"
+          [hidden]="
+            address?.get('postalCode')?.valid ||
+            address?.get('postalCode')?.pristine
+          "
+        >
+          <small *ngIf="address?.get('postalCode')?.errors?.['required']">
+            Postal Code is required
+          </small>
+        </div>
+      </div>
+
+      <div class="mb-3">
+        <label for="street" class="form-label">Street</label>
+        <input
+          type="text"
+          formControlName="street"
+          class="form-control"
+          id="street"
+          name="street"
+          [class.is-valid]="
+            address?.get('street')?.valid && address?.get('street')?.dirty
+          "
+          [class.is-invalid]="
+            address?.get('street')?.invalid && address?.get('street')?.dirty
+          "
+        />
+        <div
+          class="alert alert-warning my-2"
+          [hidden]="
+            address?.get('street')?.valid || address?.get('street')?.pristine
+          "
+        >
+          <small *ngIf="address?.get('street')?.errors?.['required']">
+            Street is required
+          </small>
+        </div>
+      </div>
+    </div>
+
+    <div
+      class="btn-group"
+      role="group"
+      aria-label="Basic radio toggle button group"
+    >
+      <!-- (change) is more appropriate here than (click) as it is a radio button -->
+      <input
+        type="radio"
+        class="btn-check"
+        formControlName="referral"
+        name="referral"
+        id="btnradio1"
+        autocomplete="off"
+        value="SocialMedia"
+        (change)="updateReferralValidators()"
+      />
+      <label class="btn btn-outline-primary" for="btnradio1"
+        >Social media</label
+      >
+
+      <input
+        type="radio"
+        class="btn-check"
+        formControlName="referral"
+        name="referral"
+        id="btnradio2"
+        autocomplete="off"
+        value="Friend"
+        (change)="updateReferralValidators()"
+      />
+      <label class="btn btn-outline-primary" for="btnradio2"
+        >from a Friend</label
+      >
+
+      <input
+        type="radio"
+        class="btn-check"
+        formControlName="referral"
+        name="referral"
+        id="btnradio3"
+        autocomplete="off"
+        value="other"
+        (change)="updateReferralValidators()"
+      />
+      <label class="btn btn-outline-primary" for="btnradio3">other</label>
+    </div>
+
+    <div class="mb-3 ms-3" *ngIf="referral?.value == 'other'">
+      <label for="rOther" class="form-label">Specify referral</label>
+      <input
+        type="text"
+        formControlName="referralOther"
+        class="form-control"
+        id="rOther"
+        name="refOhter"
+      />
+      <div
+        class="alert alert-warning my-2"
+        [hidden]="referralOther?.valid || referralOther?.untouched"
+      >
+        <small *ngIf="referralOther?.errors?.['required']">
+          referral is required
+        </small>
+      </div>
+    </div>
+
+    <div class="mb-3">
+      <label for="password" class="form-label">Password</label>
+      <input
+        type="password"
+        formControlName="password"
+        class="form-control"
+        id="password"
+        name="password"
+
+        [class.is-valid]="
+        password?.valid 
+        && password?.dirty 
+        && !userRegisterForm.errors?.['AdvValidationError']['WeakPassword']"
+
+        [class.is-invalid]="
+        password?.dirty &&
+        (password?.invalid || userRegisterForm.errors?.['AdvValidationError']['WeakPassword'])"
+      />
+      <div
+        class="alert alert-warning my-2"
+        [hidden]="
+        password?.pristine || 
+        (
+          password?.value?.length >= 6 
+          && !userRegisterForm.errors?.['AdvValidationError']['WeakPassword']
+        )"
+      >
+        <small *ngIf="password?.errors?.['required']">
+          Password is required</small
+        >
+
+        <small *ngIf="password?.errors?.['minlength']">
+          Password must be 6 characters at least
+        </small>
+
+        <small
+          *ngIf="userRegisterForm.errors?.['AdvValidationError']?.['WeakPassword']"
+        >
+          {{userRegisterForm.errors?.['AdvValidationError']?.['WeakPassword'].reason}}
+        </small>
+      </div>
+    </div>
+
+    <div class="mb-3">
+      <label for="confirmPassword" class="form-label">Confirm Password</label>
+      <input
+        type="password"
+        formControlName="confirmPassword"
+        class="form-control"
+        id="confirmPassword"
+        name="confirmPassword"
+
+        [class.is-valid]="
+          !userRegisterForm.errors?.['AdvValidationError']['WeakPassword']
+          && !userRegisterForm.errors?.['AdvValidationError']['PasswordNotMatch']
+          && confirmPassword?.valid 
+          && confirmPassword?.dirty"
+          
+        [class.is-invalid]="
+          userRegisterForm.errors?.['AdvValidationError']['PasswordNotMatch']
+          && confirmPassword?.dirty"
+      />
+      <div
+        class="alert alert-warning my-2"
+        [hidden]="
+          confirmPassword?.pristine 
+          || !userRegisterForm.errors?.['AdvValidationError']['PasswordNotMatch']
+        "
+      >
+        <small *ngIf="confirmPassword?.errors?.['required']">
+          Confirm Password is required
+        </small>
+
+        <!-- <small
+          *ngIf="userRegisterForm.errors?.['PasswordNotMatch'] && !confirmPassword?.errors?.['required']"
+        > 
+          Confirm Password and Password must be the same
+        </small>
+        -->
+
+        <small
+          *ngIf="
+          userRegisterForm.errors?.['AdvValidationError']?.['PasswordNotMatch'] 
+          && !confirmPassword?.errors?.['required']"
+        >
+          Confirm Password and Password must be the same
+        </small>
+
+        <!-- <small
+          *ngIf="userRegisterForm.errors?.['AdvValidationError']?.['WeakPassword'] && !confirmPassword?.errors?.['required']"
+        >
+          {{userRegisterForm.errors?.['AdvValidationError']?.['WeakPassword'].reason}}
+        </small> -->
+      </div>
+    </div>
+
+    <button
+      [disabled]="userRegisterForm.invalid"
+      type="submit"
+      class="btn btn-primary"
+    >
+      Submit
+    </button>
+
+    <div>
+      AdvValidationError:
+      {{userRegisterForm.errors?.['AdvValidationError'] | json}}
+    </div>
+    <div>
+      PasswordNotMatch: {{userRegisterForm.errors?.['PasswordNotMatch'] | json}}
+    </div>
+
+    <div>
+      WeakPassword: {{userRegisterForm.errors?.['WeakPassword'] | json}}
+    </div>
+  </form>
+</div>

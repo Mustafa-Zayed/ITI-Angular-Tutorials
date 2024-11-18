@@ -60,11 +60,20 @@ export class AddProductComponent implements OnInit, OnDestroy {
       this.productId = Number(params.get('productID'));
 
       // console.log(this.productId);
-      if (this.productId == 0) return;
+      if (this.productId == 0) return; // no productId means it's a new product not editing, Number(null) => 0
+
+      // if (!params.has('productID')) return;
 
       let sub = this.productsService
         .getProductById(this.productId)
-        .subscribe((product) => (this.newProduct = product));
+        .subscribe((product) => {
+          this.newProduct = product;
+
+          // reset the imgURL as browsers restrict programmatic interaction with file input fields
+          // to protect user privacy and to avoid security vulnerabilities.
+          // Not professional solution, but it works anyway.
+          this.newProduct.imgURL = ''; 
+        });
       this.subscriptions.push(sub);
     });
   }
